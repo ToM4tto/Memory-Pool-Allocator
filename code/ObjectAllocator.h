@@ -1,3 +1,16 @@
+/**
+ * @file ObjectAllocator.h
+ * @author Matthias Ong Si En (ong.s@digipen.edu)
+ * @par Course: CSD2181
+ * @par Assignment #1    
+ * @brief This file provides the interface of ObjectAllocator, which is a memory pool allocator that
+ * provides clients with fixed-sized memory blocks to use.
+ * @date 2022-01-29
+ * @copyright Copyright (C) 2022 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
 //---------------------------------------------------------------------------
 #ifndef OBJECTALLOCATORH
 #define OBJECTALLOCATORH
@@ -205,6 +218,9 @@ struct MemBlockInfo
   bool in_use;        //!< Is the block free or in use?
   char *label;        //!< A dynamically allocated NUL-terminated string
   unsigned alloc_num; //!< The allocation number (count) of this block
+
+  MemBlockInfo(bool use, const char* str, unsigned allocs);
+  ~MemBlockInfo();
 };
 
 /*!
@@ -265,6 +281,19 @@ class ObjectAllocator
     GenericObject *FreeList_; //!< the beginning of the list of objects
     
     // Lots of other private stuff... 
+    OAConfig configuration;                 // configuration parameters for ObjectAllocator
+    OAStats stats;                   // statistical data for ObjectAllocator
+    size_t pageHeader;                  // Header of page size
+    size_t dataSize;                    // The size of each mid block
+    size_t totalDataSize;               // Total size of mid data blocks and last data  block
+
+    //Functions
+    void AllocateNewPage(GenericObject* &page);       // allocates new page
+    void AddToFreeList(GenericObject* obj); //Adds object to start of freelist
+    void CheckPageBoundary(const unsigned char* obj);
+    void CheckPadding(const unsigned char* obj);
+    bool IsPageEmpty(GenericObject* page);
+    void FreePage(GenericObject* page);
 };
 
 #endif
